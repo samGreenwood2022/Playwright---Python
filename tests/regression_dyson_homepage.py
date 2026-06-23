@@ -15,7 +15,7 @@ from playwright.sync_api import expect
 # Constants for selectors used in the tests below. These are kept here to avoid
 # duplication and to make it easier to update if the site changes.
 SEARCH_BOX = "input[name='search']:visible"
-MANUFACTURER_TAB = "tab[name='Manufacturers']"
+MANUFACTURER_TAB = "role=tab[name='Manufacturers']"
 DYSON_TILE = 'a[href^="/en/manufacturer/dyson/"]'
 DYSON_URL = "https://source.thenbs.com/en/manufacturer/dyson/nakAxHWxDZprdqkBaCdn4U/overview"
 

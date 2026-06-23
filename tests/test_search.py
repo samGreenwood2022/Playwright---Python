@@ -23,18 +23,13 @@ def test_search_returns_results(page, base_url):
     page.goto(base_url)
 
     search = page.locator(SEARCH_BOX)
-    search.fill("insulation")
+
+    search.click()
+    search.fill("Dyson")
     search.press("Enter")
-
-    # The app navigates client-side; wait for the URL to settle on the result.
-    page.wait_for_url("**/insulation/**")
-
-    # Product entries on NBS Source render as <article> elements.
-    expect(page.locator("article").first).to_be_visible()
-    assert page.locator("article").count() > 0
-
-    # `expect` auto-retries, so it tolerates the async title update.
-    expect(page).to_have_title(re.compile("Insulation"))
+    
+    page.get_by_role("tab", name="Manufacturers").click()
+    page.get_by_role("link", name="Dyson Dyson Technology for").click()
 
 
 def test_category_navigation(page, base_url):

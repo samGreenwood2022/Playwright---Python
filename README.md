@@ -56,6 +56,7 @@ pytest                       # run everything (uses pytest.ini defaults)
 pytest -m smoke              # only tests marked @pytest.mark.smoke
 pytest --headed              # watch the browser
 pytest -k home_page          # tests whose name matches "home_page"
+playwright codegen --target python-pytest https://source.thenbs.com # Print pytest-style Python to the Inspector window
 ```
 
 An HTML report is written to `report.html` after each run.

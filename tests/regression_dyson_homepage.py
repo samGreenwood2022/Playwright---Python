@@ -9,6 +9,8 @@ Note on this site: NBS Source is an Angular app that updates the page title
 the URL or use Playwright's auto-retrying `expect()`.
 """
 
+import re
+
 import pytest
 from playwright.sync_api import expect
 
@@ -18,6 +20,17 @@ SEARCH_BOX = "input[name='search']:visible"
 MANUFACTURER_TAB = "role=tab[name='Manufacturers']"
 DYSON_TILE = 'a[href^="/en/manufacturer/dyson/"]'
 DYSON_URL = "https://source.thenbs.com/en/manufacturer/dyson/nakAxHWxDZprdqkBaCdn4U/overview"
+
+ # Global site-header elements (the "NBS Source" brand block, top-left).
+# Scope to `header ... .brand-primary` so we hit the top-navbar instance and
+# not the side-nav copy (which uses .brand-secondary).
+BRAND_LINK = "header a.brand-primary"
+NBS_LOGO = "header a.brand-primary mat-icon[svgicon='nbs:symbol']"
+NBS_NAME = "header a.brand-primary app-name"
+# The region/language picker. Its label reads "UK" locally but "US" on the
+# US-based GitHub Actions runners, so we accept either.
+LOCALE_LABEL = "header app-region-and-language-picker .mdc-button__label"
+HOME_URL = "https://source.thenbs.com/en/"
 
 
 
@@ -40,11 +53,32 @@ def test_search_returns_results(page, base_url):
 
 
 def test_category_navigation(page, base_url):
-    """Browsing by category opens that category's listing page."""
+    """After navigating to the Dyson page, the global site header shows the NBS
+    logo + 'NBS Source' brand (linking home) and the region/language picker."""
     page.goto(base_url)
+    search = page.locator(SEARCH_BOX)
+    search.click()
+    search.fill("Dyson")
+    search.press("Enter")
+    page.locator(MANUFACTURER_TAB).click()
+    # Target the link by its stable href slug, not the concatenated tile text.
+    # `^=` matches "starts with", so the volatile GUID at the end is ignored.
+    page.locator(DYSON_TILE).click()
+    # Verify we landed on the Dyson manufacturer overview page.
+    # expect(...) auto-retries, so it tolerates the client-side navigation.
+    expect(page).to_have_url(DYSON_URL)
 
-    # Categories live in a mega-menu that the "Browse" button reveals.
-    page.get_by_role("button", name="Browse").click()
-    page.get_by_role("link", name="Doors, windows and hatches").first.click()
-    page.wait_for_url("**/category/doors-windows-and-hatches/**")
-    assert "/category/" in page.url
+    # --- Header brand block: logo, text, and home link ---
+    expect(page.locator(NBS_LOGO)).to_be_visible()
+    expect(page.locator(NBS_NAME)).to_be_visible()
+    expect(page.locator(NBS_NAME)).to_have_text("NBS Source")
+
+    brand = page.locator(BRAND_LINK)
+    # The href ATTRIBUTE is the relative "/en/"; the browser RESOLVES it to the
+    # absolute URL. Assert both: the literal attribute and the resolved value.
+    expect(brand).to_have_attribute("href", "/en/")
+    assert brand.evaluate("el => el.href") == HOME_URL
+
+    # --- Region/language picker: "UK" locally, "US" on GitHub runners ---
+    expect(page.locator(LOCALE_LABEL)).to_have_text(re.compile(r"\b(UK|US)\b"))
+

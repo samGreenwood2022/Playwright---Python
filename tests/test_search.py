@@ -30,7 +30,9 @@ def test_search_returns_results(page, base_url):
     search.press("Enter")
     
     page.get_by_role("tab", name="Manufacturers").click()
-    page.get_by_role("link", name="Dyson Dyson Technology for").click()
+    # Target the link by its stable href slug, not the concatenated tile text.
+    # `^=` matches "starts with", so the volatile GUID at the end is ignored.
+    page.locator('a[href^="/en/manufacturer/dyson/"]').click()
 
     # Verify we landed on the Dyson manufacturer overview page.
     # expect(...) auto-retries, so it tolerates the client-side navigation.

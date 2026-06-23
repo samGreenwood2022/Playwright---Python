@@ -1,0 +1,115 @@
+/*
+ * Dark theme for the pytest-html report.
+ * Loaded via `--css assets/report.css` (see pytest.ini). pytest-html appends
+ * this AFTER its bundled style.css, so everything here overrides the defaults.
+ * Targets pytest-html 4.x markup (#results-table, .col-result, .summary, etc.).
+ */
+
+:root {
+  --bg:        #15161e;  /* page background            */
+  --surface:   #1e2030;  /* cards, table cells         */
+  --surface-2: #272a3d;  /* header row, hover          */
+  --border:    #343852;  /* subtle borders             */
+  --text:      #c8ccdc;  /* primary text               */
+  --text-dim:  #8a8fa8;  /* secondary text, links      */
+  --accent:    #8b7cff;  /* headings / accents (violet)*/
+  --pass:      #4ade80;  /* green  */
+  --fail:      #f87171;  /* red    */
+  --warn:      #fbbf24;  /* orange */
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 24px 32px;
+}
+
+h1 {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+h2 {
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+p { color: var(--text-dim); }
+
+a, a:visited { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---- Summary / environment cards ---- */
+.summary__data,
+#environment {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+}
+
+#environment td { color: var(--text); border-color: var(--border); }
+#environment tr:nth-child(odd) { background: var(--surface-2); }
+
+.controls,
+.filters,
+.collapse { color: var(--text-dim); }
+
+/* ---- Result counters in the run summary ---- */
+.passed  { color: var(--pass); }
+.failed,
+.error   { color: var(--fail); }
+.skipped,
+.xfailed,
+.rerun   { color: var(--warn); }
+
+/* ---- Results table ---- */
+#results-table {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#results-table th {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+#results-table td { border-color: var(--border); }
+
+.results-table-row:hover td { background: var(--surface-2); }
+
+/* Per-status text in the result column */
+.passed  .col-result { color: var(--pass); font-weight: 600; }
+.failed  .col-result,
+.error   .col-result,
+.xpassed .col-result { color: var(--fail); font-weight: 600; }
+.skipped .col-result,
+.xfailed .col-result,
+.rerun   .col-result { color: var(--warn); font-weight: 600; }
+
+/* ---- Log / traceback blocks ---- */
+.logwrapper .log {
+  background: #0e0f17;
+  color: #d4d7e5;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: "Cascadia Code", "Consolas", monospace;
+  font-size: 12px;
+}
+
+/* Make the green/red bands at the start of a log line readable on dark */
+.log .error,
+.log .failed { color: var(--fail); }
+.log .passed { color: var(--pass); }

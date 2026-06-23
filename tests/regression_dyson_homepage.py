@@ -19,9 +19,11 @@ from playwright.sync_api import expect
 SEARCH_BOX = "input[name='search']:visible"
 MANUFACTURER_TAB = "role=tab[name='Manufacturers']"
 DYSON_TILE = 'a[href^="/en/manufacturer/dyson/"]'
-DYSON_URL = "https://source.thenbs.com/en/manufacturer/dyson/nakAxHWxDZprdqkBaCdn4U/overview"
+DYSON_URL = (
+    "https://source.thenbs.com/en/manufacturer/dyson/nakAxHWxDZprdqkBaCdn4U/overview"
+)
 
- # Global site-header elements (the "NBS Source" brand block, top-left).
+# Global site-header elements (the "NBS Source" brand block, top-left).
 # Scope to `header ... .brand-primary` so we hit the top-navbar instance and
 # not the side-nav copy (which uses .brand-secondary).
 BRAND_LINK = "header a.brand-primary"
@@ -32,6 +34,34 @@ NBS_NAME = "header a.brand-primary app-name"
 LOCALE_LABEL = "header app-region-and-language-picker .mdc-button__label"
 HOME_URL = "https://source.thenbs.com/en/"
 
+
+@pytest.fixture
+def dyson_page(page, base_url):
+    """Navigate to the Dyson manufacturer overview page and hand back the
+    Playwright `page`, ready for regression assertions.
+
+    This is the pytest equivalent of a `beforeEach` hook: it performs the
+    shared search-and-navigate journey so individual tests can start from the
+    Dyson page instead of repeating the setup. The `expect(...).to_have_url`
+    call doubles as a precondition guard — if we never land on the Dyson page,
+    the fixture errors out and dependent tests are reported as errors (clearly
+    a setup problem) rather than confusing assertion failures.
+
+    Note: `test_search_returns_results` deliberately does NOT use this fixture —
+    that search journey is the thing it's testing, so it stays inline.
+    """
+    page.goto(base_url)
+    search = page.locator(SEARCH_BOX)
+    search.click()
+    search.fill("Dyson")
+    search.press("Enter")
+    page.locator(MANUFACTURER_TAB).click()
+    # Target the link by its stable href slug, not the concatenated tile text.
+    # `^=` matches "starts with", so the volatile GUID at the end is ignored.
+    page.locator(DYSON_TILE).click()
+    # expect(...) auto-retries, so it tolerates the client-side navigation.
+    expect(page).to_have_url(DYSON_URL)
+    return page
 
 
 @pytest.mark.search
@@ -52,21 +82,10 @@ def test_search_returns_results(page, base_url):
     expect(page).to_have_url(DYSON_URL)
 
 
-def test_category_navigation(page, base_url):
+def test_category_navigation(dyson_page):
     """After navigating to the Dyson page, the global site header shows the NBS
     logo + 'NBS Source' brand (linking home) and the region/language picker."""
-    page.goto(base_url)
-    search = page.locator(SEARCH_BOX)
-    search.click()
-    search.fill("Dyson")
-    search.press("Enter")
-    page.locator(MANUFACTURER_TAB).click()
-    # Target the link by its stable href slug, not the concatenated tile text.
-    # `^=` matches "starts with", so the volatile GUID at the end is ignored.
-    page.locator(DYSON_TILE).click()
-    # Verify we landed on the Dyson manufacturer overview page.
-    # expect(...) auto-retries, so it tolerates the client-side navigation.
-    expect(page).to_have_url(DYSON_URL)
+    page = dyson_page
 
     # --- Header brand block: logo, text, and home link ---
     expect(page.locator(NBS_LOGO)).to_be_visible()
@@ -81,4 +100,3 @@ def test_category_navigation(page, base_url):
 
     # --- Region/language picker: "UK" locally, "US" on GitHub runners ---
     expect(page.locator(LOCALE_LABEL)).to_have_text(re.compile(r"\b(UK|US)\b"))
-

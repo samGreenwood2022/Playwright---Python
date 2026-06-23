@@ -1,0 +1,25 @@
+# Virtual environment (the Python equivalent of node_modules — never commit it)
+.venv/
+venv/
+env/
+
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+
+# Test artifacts
+test-results/
+playwright-report/
+report.html
+*.png
+videos/
+traces/
+
+# Environment / secrets
+.env
+
+# IDE
+.idea/
+.vscode/

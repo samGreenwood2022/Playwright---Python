@@ -1,0 +1,10 @@
+# Core test + browser automation
+pytest==8.3.4
+pytest-playwright==0.6.2
+
+# BDD / Cucumber-style Gherkin (Phase 4)
+pytest-bdd==8.1.0
+
+# Nice-to-haves
+pytest-html==4.1.1        # HTML test reports
+python-dotenv==1.0.1      # load config/secrets from a .env file

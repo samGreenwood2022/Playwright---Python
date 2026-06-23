@@ -10,14 +10,10 @@ pytest-playwright already gives us ready-made fixtures: `page`, `browser`,
 
 import pytest
 
-# Base URL for the site under test. Override with the BASE_URL env var if needed.
-BASE_URL = "https://source.thenbs.com"
-
-
-@pytest.fixture(scope="session")
-def base_url() -> str:
-    """The root URL of the application under test (NBS Source)."""
-    return BASE_URL
+# NOTE: there is deliberately NO `base_url` fixture here anymore.
+# It now comes from the pytest-base-url plugin, configured by the
+# `base_url = ...` line in pytest.ini. Tests still request it the same way —
+# by naming a `base_url` parameter — pytest just resolves it from the plugin.
 
 
 @pytest.fixture

@@ -19,7 +19,8 @@ SEARCH_BOX = "input[name='search']:visible"
 
 @pytest.mark.search
 def test_search_returns_results(page, base_url):
-    """Searching for a product term lands on a results page with products."""
+    """Searching for 'Dyson' and opening the Manufacturers tab navigates to the
+    Dyson manufacturer overview page."""
     page.goto(base_url)
 
     search = page.locator(SEARCH_BOX)
@@ -30,6 +31,12 @@ def test_search_returns_results(page, base_url):
     
     page.get_by_role("tab", name="Manufacturers").click()
     page.get_by_role("link", name="Dyson Dyson Technology for").click()
+
+    # Verify we landed on the Dyson manufacturer overview page.
+    # expect(...) auto-retries, so it tolerates the client-side navigation.
+    expect(page).to_have_url(
+        "https://source.thenbs.com/en/manufacturer/dyson/nakAxHWxDZprdqkBaCdn4U/overview"
+    )
 
 
 def test_category_navigation(page, base_url):

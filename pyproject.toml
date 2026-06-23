@@ -1,0 +1,20 @@
+# pyproject.toml — standard home for Python *tool* configuration.
+# (Dependencies stay in requirements.txt; this file just configures Ruff.)
+
+[tool.ruff]
+# Match the formatter's default line length and our Python version.
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+# Which rule groups to enable. This is a sensible, not-too-noisy starter set:
+#   E, W  pycodestyle      — style issues (spacing, indentation)
+#   F     pyflakes         — real bugs: unused imports/variables, undefined names
+#   I     isort            — import ordering / grouping
+#   B     flake8-bugbear   — likely-bug patterns
+#   UP    pyupgrade        — flags outdated syntax for your Python version
+select = ["E", "W", "F", "I", "B", "UP"]
+
+[tool.ruff.format]
+# Ruff's formatter is Black-compatible (the "Prettier" of Python).
+quote-style = "double"

@@ -60,6 +60,11 @@ playwright codegen --target python-pytest https://source.thenbs.com # Print pyte
 pytest --tracing on                  # always record a trace
 pytest --tracing retain-on-failure   # record, but only KEEP it if the test fails (best default)
 playwright show-trace test-results\<test-name>\trace.zip
+
+ruff check .            # lint (like: eslint .)
+ruff check --fix .      # lint + auto-fix
+ruff format .           # format (like: prettier --write .)
+ruff check --watch .    # lint continuously
 ```
 
 An HTML report is written to `report.html` after each run.

@@ -8,3 +8,6 @@ pytest-bdd==8.1.0
 # Nice-to-haves
 pytest-html==4.1.1        # HTML test reports
 python-dotenv==1.0.1      # load config/secrets from a .env file
+
+# Linting + formatting (the "ESLint + Prettier" of Python, in one tool)
+ruff==0.15.18

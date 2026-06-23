@@ -9,8 +9,6 @@ Note on this site: NBS Source is an Angular app that updates the page title
 the URL or use Playwright's auto-retrying `expect()`.
 """
 
-import re
-
 import pytest
 from playwright.sync_api import expect
 
@@ -28,7 +26,7 @@ def test_search_returns_results(page, base_url):
     search.click()
     search.fill("Dyson")
     search.press("Enter")
-    
+
     page.get_by_role("tab", name="Manufacturers").click()
     # Target the link by its stable href slug, not the concatenated tile text.
     # `^=` matches "starts with", so the volatile GUID at the end is ignored.

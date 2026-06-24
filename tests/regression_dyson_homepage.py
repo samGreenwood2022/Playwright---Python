@@ -12,7 +12,7 @@ the URL or use Playwright's auto-retrying `expect()`.
 import re
 
 import pytest
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
 # Constants for selectors used in the tests below. These are kept here to avoid
 # duplication and to make it easier to update if the site changes.
@@ -36,7 +36,7 @@ HOME_URL = "https://source.thenbs.com/en/"
 
 
 @pytest.fixture
-def dyson_page(page, base_url):
+def dyson_page(page: Page, base_url: str) -> Page:
     """Navigate to the Dyson manufacturer overview page and hand back the
     Playwright `page`, ready for regression assertions.
 
@@ -65,7 +65,7 @@ def dyson_page(page, base_url):
 
 
 @pytest.mark.search
-def test_search_returns_results(page, base_url):
+def test_search_returns_results(page: Page, base_url: str) -> None:
     """Searching for 'Dyson' and opening the Manufacturers tab navigates to the
     Dyson manufacturer overview page."""
     page.goto(base_url)
@@ -82,7 +82,7 @@ def test_search_returns_results(page, base_url):
     expect(page).to_have_url(DYSON_URL)
 
 
-def test_category_navigation(dyson_page):
+def test_category_navigation(dyson_page: Page) -> None:
     """After navigating to the Dyson page, the global site header shows the NBS
     logo + 'NBS Source' brand (linking home) and the region/language picker."""
     page = dyson_page

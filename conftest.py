@@ -12,8 +12,9 @@ import base64
 from pathlib import Path
 
 import pytest
-from slugify import slugify
+from playwright.sync_api import Page
 from pytest_playwright.pytest_playwright import _truncate_file_name
+from slugify import slugify
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -71,7 +72,7 @@ def pytest_runtest_makereport(item, call):
 
 
 @pytest.fixture
-def home_page(page, base_url):
+def home_page(page: Page, base_url: str) -> Page:
     """
     Opens the NBS Source home page and hands back the Playwright `page`.
 

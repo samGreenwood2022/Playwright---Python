@@ -26,6 +26,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Type-check (mypy)
+        # Run BEFORE the browser install so type errors fail in seconds rather
+        # than after downloading Chromium. Paths come from [tool.mypy] in
+        # pyproject.toml (the `files` setting), so a bare `mypy` checks exactly
+        # the same files as the pre-commit hook — one source of truth.
+        run: mypy
+
       - name: Install Playwright browsers
         # --with-deps also installs the OS libraries the browsers need.
         run: playwright install --with-deps chromium

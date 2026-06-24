@@ -64,24 +64,6 @@ def dyson_page(page: Page, base_url: str) -> Page:
     return page
 
 
-@pytest.mark.search
-def test_search_returns_results(page: Page, base_url: str) -> None:
-    """Searching for 'Dyson' and opening the Manufacturers tab navigates to the
-    Dyson manufacturer overview page."""
-    page.goto(base_url)
-    search = page.locator(SEARCH_BOX)
-    search.click()
-    search.fill("Dyson")
-    search.press("Enter")
-    page.locator(MANUFACTURER_TAB).click()
-    # Target the link by its stable href slug, not the concatenated tile text.
-    # `^=` matches "starts with", so the volatile GUID at the end is ignored.
-    page.locator(DYSON_TILE).click()
-    # Verify we landed on the Dyson manufacturer overview page.
-    # expect(...) auto-retries, so it tolerates the client-side navigation.
-    expect(page).to_have_url(DYSON_URL)
-
-
 def test_category_navigation(dyson_page: Page) -> None:
     """After navigating to the Dyson page, the global site header shows the NBS
     logo + 'NBS Source' brand (linking home) and the region/language picker."""

@@ -10,6 +10,7 @@ Run a single test:  pytest tests/test_smoke.py::test_home_page_loads
 """
 
 import pytest
+from playwright.sync_api import Page
 
 # NBS Source is an Angular Material app. Its search box is a Material text input
 # (role "textbox", NOT "searchbox") rendered twice for responsive layouts, so we
@@ -18,14 +19,14 @@ SEARCH_BOX = "input[name='search']:visible"
 
 
 @pytest.mark.smoke
-def test_home_page_loads(page, base_url):
+def test_home_page_loads(page: Page, base_url: str) -> None:
     """The NBS Source home page loads and has the expected title."""
     page.goto(base_url)
     assert "NBS Source" in page.title()
 
 
 @pytest.mark.smoke
-def test_search_box_is_visible(home_page):
+def test_search_box_is_visible(home_page: Page) -> None:
     """A single, visible search box is present on the home page."""
     search = home_page.locator(SEARCH_BOX)
     assert search.count() == 1

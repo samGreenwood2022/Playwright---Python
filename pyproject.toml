@@ -18,3 +18,39 @@ select = ["E", "W", "F", "I", "B", "UP"]
 [tool.ruff.format]
 # Ruff's formatter is Black-compatible (the "Prettier" of Python).
 quote-style = "double"
+
+# ---------------------------------------------------------------------------
+# mypy — static type checker. This is what turns the type hints into actual
+# "catch errors before the browser launches" checks (the closest thing Python
+# has to TypeScript's compile step). Run it with:  mypy .
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+# Only check our own code. Listing files here means a bare `mypy .` (or just
+# `mypy`) checks the right things without extra arguments.
+files = ["tests", "pages", "conftest.py"]
+
+# Type-check the bodies of functions even when they have no annotations yet.
+# This is what flags a mistyped `page.gotoo(...)` inside a test, so you get
+# value immediately without having to annotate every single function first.
+check_untyped_defs = true
+
+# Quality-of-life warnings that keep the type hints honest over time:
+warn_redundant_casts = true   # flag casts that do nothing
+warn_unused_ignores = true    # flag `# type: ignore` comments no longer needed
+
+# Some of our dependencies ship no type information (no `py.typed` marker).
+# Rather than silence ALL missing-import errors globally, we opt out per module
+# so a genuinely mistyped import elsewhere is still caught.
+[[tool.mypy.overrides]]
+module = ["slugify", "pytest_playwright.*"]
+ignore_missing_imports = true
+
+# The pytest_html hook in conftest.py manipulates report objects via attributes
+# that pytest/pytest-html add dynamically (e.g. `report.extras`), which a static
+# checker can't see. Relax body-checking there so those lines don't error.
+# (Everything else in conftest.py — like the typed `home_page` fixture — is
+# still fully checked.)
+[[tool.mypy.overrides]]
+module = "conftest"
+check_untyped_defs = false

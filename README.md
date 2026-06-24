@@ -52,13 +52,13 @@ playwright install
 ## Running tests
 
 ```bash
-pytest                       # run everything (uses pytest.ini defaults)
-pytest -m smoke              # only tests marked @pytest.mark.smoke
-pytest --headed              # watch the browser
-pytest -k home_page          # tests whose name matches "home_page"
+pytest                                                              # run everything (uses pytest.ini defaults)
+pytest -m smoke                                                     # only tests marked @pytest.mark.smoke
+pytest --headed                                                     # watch the browser
+pytest -k home_page                                                 # tests whose name matches "home_page"
 playwright codegen --target python-pytest https://source.thenbs.com # Print pytest-style Python to the Inspector window
-pytest --tracing on                  # always record a trace
-pytest --tracing retain-on-failure   # record, but only KEEP it if the test fails (best default)
+pytest --tracing on                                                 # always record a trace
+pytest --tracing retain-on-failure                                  # record, but only KEEP it if the test fails (best default)
 playwright show-trace test-results\<test-name>\trace.zip
 
 ruff check .            # lint (like: eslint .)

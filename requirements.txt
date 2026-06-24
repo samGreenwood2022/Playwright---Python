@@ -11,3 +11,10 @@ python-dotenv==1.0.1      # load config/secrets from a .env file
 
 # Linting + formatting (the "ESLint + Prettier" of Python, in one tool)
 ruff==0.15.18
+
+# Static type checking (the "tsc" of Python — catches type errors before run)
+mypy==2.1.0
+
+# Git hook manager — runs ruff + mypy automatically on every commit.
+# After installing: run `pre-commit install` once to register the git hook.
+pre-commit==4.6.0

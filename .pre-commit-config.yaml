@@ -1,0 +1,39 @@
+# .pre-commit-config.yaml
+# Git pre-commit hooks: run ruff + mypy automatically on every `git commit`,
+# BEFORE the commit is created — catching issues earlier than CI (and before
+# you push at all).
+#
+# One-time setup after cloning + installing deps:
+#     pre-commit install          # registers the git hook (.git/hooks/pre-commit)
+# Run manually against the whole repo (e.g. the first time):
+#     pre-commit run --all-files
+#
+# These hooks run in environments pre-commit creates and manages itself, so the
+# tools work no matter HOW you commit — from a terminal, from the VS Code Git
+# UI, etc. (They do NOT rely on your .venv being active / on PATH.) The trade-off
+# vs. running your .venv tools directly is that the versions are pinned here
+# rather than in requirements.txt, so keep the `rev`s below roughly in step with
+# requirements.txt (or run `pre-commit autoupdate` to bump them).
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.18 # keep in sync with ruff in requirements.txt
+    hooks:
+      - id: ruff-check # lint
+        args: [--fix] # auto-fix what it safely can
+      - id: ruff-format # format (Black-compatible)
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.1.0 # keep in sync with mypy in requirements.txt
+    hooks:
+      - id: mypy
+        # mypy runs in its OWN isolated env, so it needs the typed libraries we
+        # import installed here too — otherwise it would treat e.g. `Page` as
+        # `Any` and silently stop catching `page.gotoo`-style typos.
+        # (slugify / pytest_playwright are handled by ignore_missing_imports in
+        # pyproject.toml, so they don't need listing.)
+        additional_dependencies:
+          - playwright==1.60.0
+          - pytest==8.3.4
+        # Check the whole project via [tool.mypy] in pyproject.toml rather than
+        # only the changed files (which would bypass that config).
+        pass_filenames: false

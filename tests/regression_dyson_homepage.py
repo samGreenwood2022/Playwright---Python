@@ -34,6 +34,43 @@ NBS_NAME = "header a.brand-primary app-name"
 LOCALE_LABEL = "header app-region-and-language-picker .mdc-button__label"
 HOME_URL = "https://source.thenbs.com/en/"
 
+# --- Main navigation header (the tab strip shown on every page) ---------------
+# Scope everything to this nav by its accessible name, so we never accidentally
+# match the responsive side-nav copy of the same links.
+MAIN_NAV = "nav[aria-label='Main navigation links']"
+# Each tab's visible text lives in a `span.mdc-button__label`. The dropdown
+# *menu* items use a different class (`.menu-panel-link`), so this selector
+# resolves to exactly the seven top-level tabs — handy for the order check.
+NAV_TAB_LABELS = f"{MAIN_NAV} .mdc-button__label"
+
+# Link tabs we verify by href, keyed by visible label -> (selector, href).
+# Most expose a stable `data-cy` test hook; Home only carries title="Homepage".
+HEADER_LINKS = {
+    "Home": (f"{MAIN_NAV} a[title='Homepage']", "/en/"),
+    "What's new": (f"{MAIN_NAV} a[data-cy='whatsNewNavButton']", "/en/whats-new"),
+    "Inspiration": (f"{MAIN_NAV} a[data-cy='inspirationNavButton']", "/en/inspiration"),
+    "Collections": (f"{MAIN_NAV} a[data-cy='collectionsNavButton']", "/en/collections"),
+    "CPD": (f"{MAIN_NAV} a[data-cy='cpdNavButton']", "/en/cpd"),
+}
+
+# Dropdown tabs: these open menus (covered in a later test), so for now we only
+# assert the tab itself is visible. They render as <button>, not <a>.
+HEADER_DROPDOWNS = {
+    "Browse": f"{MAIN_NAV} button[title='Browse']",
+    "BIM Library": f"{MAIN_NAV} button[title='BIM Library']",
+}
+
+# The full left-to-right order every tab should appear in.
+EXPECTED_TAB_ORDER = [
+    "Home",
+    "What's new",
+    "Browse",
+    "BIM Library",
+    "Inspiration",
+    "Collections",
+    "CPD",
+]
+
 
 @pytest.fixture
 def dyson_page(page: Page, base_url: str) -> Page:
@@ -82,3 +119,38 @@ def test_category_navigation(dyson_page: Page) -> None:
 
     # --- Region/language picker: "UK" locally, "US" on GitHub runners ---
     expect(page.locator(LOCALE_LABEL)).to_have_text(re.compile(r"\b(UK|US)\b"))
+
+
+def test_common_header_elements(dyson_page: Page) -> None:
+    """The site-wide main navigation shows every tab, in the correct order, with
+    the link tabs pointing at the right hrefs.
+
+    Three checks:
+      1. Link tabs (Home, What's new, Inspiration, Collections, CPD) are visible
+         AND carry the expected href.
+      2. Dropdown tabs (Browse, BIM Library) are visible by label only — their
+         menus open on hover/click and are covered in a separate test.
+      3. All seven tabs appear in the expected left-to-right order.
+    """
+    page = dyson_page
+
+    # --- 1. Link tabs: visible and pointing at the correct href ---
+    # The `message=` arg names the failing tab in the report, which matters in a
+    # loop where every iteration shares the same assertion call site.
+    for name, (selector, href) in HEADER_LINKS.items():
+        tab = page.locator(selector)
+        expect(tab, message=f"'{name}' tab should be visible").to_be_visible()
+        expect(tab, message=f"'{name}' tab should link to {href}").to_have_attribute(
+            "href", href
+        )
+
+    # --- 2. Dropdown tabs: label visible (menus tested separately) ---
+    for name, selector in HEADER_DROPDOWNS.items():
+        expect(
+            page.locator(selector), message=f"'{name}' tab should be visible"
+        ).to_be_visible()
+
+    # --- 3. Order: every tab appears in the expected sequence ---
+    # Passing a list asserts the element count AND their order in one go.
+    # expect() normalises each label's surrounding whitespace (" Home " -> "Home").
+    expect(page.locator(NAV_TAB_LABELS)).to_have_text(EXPECTED_TAB_ORDER)
